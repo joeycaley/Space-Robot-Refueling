@@ -266,12 +266,15 @@ if true
     plot3(xStart, yStart, zStart, 'ko', 'MarkerSize',10, 'MarkerFaceColor','k');
     % plot the goal point and goal region
     plot3(xGoal, yGoal,zGoal, 'go', 'MarkerSize',10, 'MarkerFaceColor','g');
+    
+    [xUnit,yUnit,zUnit] = sphere(20); %unit sphere for obstacles and region
+    plot3(thresh*xUnit+xGoal,thresh*yUnit+yGoal,thresh*zUnit+zGoal);
     %th = 0:pi/50:2*pi;
     %xcircle = thresh * cos(th) + xGoal;
     %ycircle = thresh * sin(th) + yGoal;
     %h = plot(xcircle, ycircle);
     % plot the obstacles
-    [xUnit,yUnit,zUnit] = sphere(20);
+    
     for i=1:length(scale)
         surf(scale(i).*xUnit+Offset(i).x,scale(i).*yUnit+Offset(i).y,scale(i).*zUnit+Offset(i).z)
     end
