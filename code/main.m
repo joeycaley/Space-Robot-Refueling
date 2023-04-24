@@ -4,7 +4,6 @@ clear all;
 close all;
 
 addpath('mr')
-model = load_model();
 
 deg2rad = pi/180;
 R_earth = 6378e03;
@@ -125,8 +124,10 @@ end
 % output direction of approach
 if dirOfApr == 0
     fprintf("Chaser spacecraft approaches from bottom with inner transfer orbit\n")
+    T = 0; %passed to near-field planning
 else
     fprintf("Chaser spacecraft approaches from top with outer transfer orbit\n")
+    T = 1; %passed to near-field planning
 end
 
 %-PLOTTING-----------------------------------------------------------------
@@ -142,16 +143,54 @@ input("Press any key to continue\n")
 close all
 
 %% Local Path Planning to Satellite
+%This portion of the code takes the location of the spcaecraft from the
+%orbital mechanics, and calculates a trajectory for the spacecraft to get
+%within 25 m of the target craft
+
+
+%From Orbital mechanics, recieve top / bottom orientation of craft
+if T == 0
+    start.x = randi([1,10]);
+    start.y = randi([1,10]);
+    start.z = randi([250,485]);
+end
+
+if T == 1
+    start.x = randi([1,10]);
+    start.y = randi([1,10]);
+    start.z = randi([1,250]);
+end
+
+
+%Goal point randomly generated for simulation, in actual application, goal
+%location is known.
+goal.x = randi([350,490]);
+goal.y = randi([350,490]);
+goal.z = randi([350,490]);
+
+[EndLoc, NFcost, iter] = RRTstar3D(start,goal);
+
+%The EndLoc contains the x, y, and z coordinates of the craft after
+%following the RRT* trajectory. At this location, the craft will achieve a
+%velocity of 0 relative to the target spacecraft, and will have no shift in
+%roation, only location
+
+%Now, the craft body will be set as the base frame, and the target craft
+%coordinates will be transformed into the base frame
+x_end = [EndLoc.x-goal.x;EndLoc.y-goal.y; EndLoc.z-goal.z];
 
 %% Robotic Arm Manuevering
 
 %%
+
+
 N = 10;
+
+model = load_model();
 z0 = rand((N+1)*(2*model.nDof+model.nInputs) + 1,1);
 options = optimoptions('fmincon','Display','iter','Algorithm','interior-point',...
     'MaxIterations',1000,'MaxFunctionEvaluations',3000000);
-x_start = rand(3,1);
-z = fmincon(@(z)cost(z,N,model),z0,[],[],[],[],[],[],@(z)nonlcon(z,N,model),options);
+z = fmincon(@(z)cost(z,N,model),z0,[],[],[],[],[],[],@(z)nonlcon(z,N,x_end,model),options);
 
 %%
 [x,u,T] = extract(z,N,model);
