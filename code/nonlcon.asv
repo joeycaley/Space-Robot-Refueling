@@ -49,11 +49,11 @@ end
 % 
 % T1 = FKinSpace(model.M, model.Slist, x(1:model.nDof,1));
 % T2 = FKinSpace(model.M, model.Slist, x(1:model.nDof,N+1));
-x_start = [0;0;3]; % end effector position
+x_start = [0;0;0]; % end effector position
 T_end_start = FKinSpace(model.M,model.Slist,x(1:model.nDof,1)); %node 1 
 p_end_start = T_end_start(1:3,4);
 
-x_end = [1;1;3]; % end effector position
+x_end = [13.55;-10.2692;-3.9041]; % end effector position
 T_end_end = FKinSpace(model.M,model.Slist,x(1:model.nDof,end)); % the last node
 p_end_end = T_end_end(1:3,4);
 
