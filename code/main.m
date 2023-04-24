@@ -9,20 +9,20 @@ mu_Earth = 3.986004*10^14;
 %% Orbital Rendezvous
 
 % choose solutions to explore
-k = 1:10;
+k = 1:20;
 
 % define orbit
-a = 300e03 + R_earth;
+a = 400e03 + R_earth;
 e = 0;
-% i = 30*deg2rad;
-i = 2*pi*rand;
-RAAN = 2*pi*rand;
-% RAAN = 190*deg2rad;
+i = 30*deg2rad;
+% i = 2*pi*rand;
+% RAAN = 2*pi*rand;
+RAAN = 270*deg2rad;
 argP = 0;
 
 %-INCLINATION & RAAN CHANGE------------------------------------------------
-f = 2*pi*rand;
-% fc = 200*deg2rad;
+% f = 2*pi*rand;
+f = 60*deg2rad;
 
 [deltaVTotal, tElapsedTotal,thetaTrav] = planeChange(a,i,RAAN,f);
 
@@ -36,27 +36,23 @@ zTrav = zeros(1,length(thetaTrav));
 
 % g refers to goal, the spacecraft we are trying to reach
 % c refers to chaser, the spacecraft we control
-fg = 2*pi*rand;
-% fc = chaseAnamoly(fg,minGap);
+% fg = 2*pi*rand;
+fg = 170*deg2rad;
 fc = 0;
 
 % create orbital elements
 OE_g = [a e i RAAN argP fg];
 OE_c = [a e i RAAN argP fc];
 
-% create 
-
 % run all solutions
 for i = 1:length(k)
-    [dirOfApr, deltaV(i), tElapsed(i)] = interceptTraj(OE_g,OE_c,k(i));
+    [dirOfApr, deltaV(i), tElapsed(i), possCheck(i)] = interceptTraj(OE_g,OE_c,k(i));
 end
 
-% identify impossible solutions and remove them
-i_possible = deltaV == real(deltaV);
-
-k = k(i_possible);
-deltaV = deltaV(i_possible);
-tElapsed = tElapsed(i_possible);
+% remove impossible solutions
+k = k(possCheck);
+deltaV = deltaV(possCheck);
+tElapsed = tElapsed(possCheck);
 
 % Create sum vectors
 deltaVTotal = deltaVTotal + 2*deltaV;
