@@ -1,4 +1,4 @@
-function [dirOfApr, deltaV, tElapsed, possCheck] = interceptTraj(OE_g, OE_c, k)
+function [dirOfApr, deltaV, tElapsed, possCheck, OE_t] = interceptTraj(OE_g, OE_c, k)
 % constants
 mu_Earth = 3.986004*10^14;
 
@@ -58,7 +58,21 @@ else
     end
 end
 
-possCheck = isItPossible(deltaV,a,at);
+% if inner orbit, check if it's possible
+if dirOfApr == 0
+    possCheck = isItPossible(deltaV,a,at);
+    if possCheck
+        et = a/at - 1;
+        OE_t = [at et OE_g(3:5) 0];
+    else
+        OE_t = zeros(6,1);
+    end
+% if it's outer orbit, it is always possible
+else
+    possCheck = true;
+    et = 1 - a/at;
+    OE_t = [at et OE_g(3:5) 0];
+end
 
 end
 
