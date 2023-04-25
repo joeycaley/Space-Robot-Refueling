@@ -1,4 +1,4 @@
-function [c,ceq] = nonlcon(z,N,model)
+function [c,ceq] = nonlcon(z,N,x_end,model)
 
 umax = [150; 150; 150; 28; 28; 28];
 dqmax = [3.15; 3.15; 3.15; 3.2; 3.2; 3.2];
@@ -54,6 +54,7 @@ T_end_start = FKinSpace(model.M,model.Slist,x(1:model.nDof,1)); %node 1
 p_end_start = T_end_start(1:3,4);
 
 %x_end = [13.55;-10.2692;-3.9041]; % end effector position
+
 T_end_end = FKinSpace(model.M,model.Slist,x(1:model.nDof,end)); % the last node
 p_end_end = T_end_end(1:3,4);
 

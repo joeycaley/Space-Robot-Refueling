@@ -168,7 +168,7 @@ goal.x = randi([350,490]);
 goal.y = randi([350,490]);
 goal.z = randi([350,490]);
 
-[EndLoc, cost, iter] = RRTstar3D(start,goal);
+[EndLoc, NFcost, iter] = RRTstar3D(start,goal);
 
 %The EndLoc contains the x, y, and z coordinates of the craft after
 %following the RRT* trajectory. At this location, the craft will achieve a
@@ -177,19 +177,20 @@ goal.z = randi([350,490]);
 
 %Now, the craft body will be set as the base frame, and the target craft
 %coordinates will be transformed into the base frame
-global x_end;
 x_end = [EndLoc.x-goal.x;EndLoc.y-goal.y; EndLoc.z-goal.z];
 
 %% Robotic Arm Manuevering
 
 %%
-model = load_model();
+
+
 N = 10;
+
+model = load_model();
 z0 = rand((N+1)*(2*model.nDof+model.nInputs) + 1,1);
 options = optimoptions('fmincon','Display','iter','Algorithm','interior-point',...
     'MaxIterations',1000,'MaxFunctionEvaluations',3000000);
-x_start = rand(3,1);
-z = fmincon(@(z)cost(z,N,model),z0,[],[],[],[],[],[],@(z)nonlcon(z,N,model),options);
+z = fmincon(@(z)cost(z,N,model),z0,[],[],[],[],[],[],@(z)nonlcon(z,N,x_end,model),options);
 
 %%
 [x,u,T] = extract(z,N,model);
